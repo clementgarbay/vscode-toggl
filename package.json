@@ -1,0 +1,95 @@
+{
+	"name": "vscode-toggl",
+	"displayName": "Toggl for VSCode",
+	"description": "Toggl time tracker integration for VSCode",
+	"version": "1.0.0",
+	"author": {
+		"name": "Clément Garbay",
+		"email": "contact@clementgarbay.fr"
+	},
+	"publisher": "clementgarbay",
+	"icon": "resources/logo.png",
+	"galleryBanner": {
+		"color": "#e20605",
+		"theme": "dark"
+	},
+	"categories": [
+		"Other"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/clementgarbay/vscode-toggl"
+	},
+	"engines": {
+		"vscode": "^1.32.0"
+	},
+	"activationEvents": [
+		"onCommand:toggl.track",
+		"onCommand:toggl.setToken"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "toggl.track",
+				"title": "Start / Stop",
+				"category": "Toggl",
+				"icon": {
+					"dark": "resources/logo-white.png",
+					"light": "resources/logo-gray.png"
+				}
+			},
+			{
+				"command": "toggl.setToken",
+				"title": "Set token",
+				"category": "Toggl"
+			}
+		],
+		"menus": {
+			"editor/title": [
+				{
+					"command": "toggl.track",
+					"group": "navigation@-1"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "toggl.track"
+				},
+				{
+					"command": "toggl.setToken"
+				}
+			],
+			"touchBar": [
+				{
+					"command": "toggl.track"
+				}
+			]
+		},
+		"configuration": [
+			{
+				"title": "Toggl",
+				"properties": {
+					"toggl.extraTags": {
+						"type": "array",
+						"default": []
+					}
+				}
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "tslint -p ./",
+		"watch": "tsc -watch -p ./"
+	},
+	"dependencies": {
+		"axios": "^0.19.0",
+		"simple-git": "^1.113.0"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.32.0",
+		"typescript": "^3.5.1"
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es6",
+		"outDir": "out",
+		"sourceMap": true,
+		"strict": true,
+		"rootDir": "src",
+		"lib": ["dom", "es2015", "es2016", "es2017.string"]
+	},
+	"exclude": [
+		"node_modules",
+		".vscode-test"
+	]
+}
