@@ -3,7 +3,7 @@ import { TogglApiClient } from "./TogglApiClient";
 export default class TogglTimeEntry {
   private togglApiClient: TogglApiClient;
   private timer: number | null = null;
-  private ongoingTimeEntry: { id: string; start: Date } | null = null;
+  private runningTimeEntry: { id: string; start: Date } | null = null;
   private onStart: () => void;
   private onProgress: (msDuration: number) => void;
   private onStop: () => void;
@@ -27,61 +27,84 @@ export default class TogglTimeEntry {
   }
 
   private async start(description: string, extraTags?: string[]) {
-    if (this.ongoingTimeEntry) return;
+    if (this.runningTimeEntry) return;
 
     try {
-      this.onStart();
       const result = await this.togglApiClient.startTimeEntry(
         description,
         extraTags
       );
-      this.ongoingTimeEntry = {
+      this.runningTimeEntry = {
         id: result.data.data.id,
         start: new Date(result.data.data.start)
       };
+      this.startNotifyProgress();
     } catch {}
   }
 
   private async stop() {
-    if (!this.ongoingTimeEntry) return;
+    if (!this.runningTimeEntry) return;
 
     try {
-      await this.togglApiClient.stopTimeEntry(this.ongoingTimeEntry.id);
-      this.ongoingTimeEntry = null;
+      await this.togglApiClient.stopTimeEntry(this.runningTimeEntry.id);
+      this.runningTimeEntry = null;
       this.stopNotifyProgress();
-      this.onStop();
     } catch {}
   }
 
   private startNotifyProgress() {
+    this.onStart();
     this.timer = setInterval(() => {
-      if (!this.ongoingTimeEntry) {
+      if (!this.runningTimeEntry) {
         this.stopNotifyProgress();
         return;
       }
       const msDuration =
-        new Date().getTime() - this.ongoingTimeEntry.start.getTime();
+        new Date().getTime() - this.runningTimeEntry.start.getTime();
       this.onProgress(msDuration);
     }, 1000);
   }
 
   private stopNotifyProgress() {
+    this.onStop();
     if (this.timer) {
       clearInterval(this.timer);
     }
   }
 
   async toggle(description: string, extraTags?: string[]) {
-    if (!this.ongoingTimeEntry) {
+    if (!this.runningTimeEntry) {
       await this.start(description, extraTags);
-      this.startNotifyProgress();
     } else {
+      await this.sync();
       await this.stop();
     }
   }
 
-  getCurrentTimeEntryId() {
-    if (!this.ongoingTimeEntry) return;
-    return this.ongoingTimeEntry.id;
+  async sync() {
+    try {
+      const result = await this.togglApiClient.getRunningTimeEntry();
+      const runningTimeEntry = result.data.data;
+      const isSameRunningTimeEntry =
+        runningTimeEntry &&
+        this.runningTimeEntry &&
+        runningTimeEntry.id !== this.runningTimeEntry.id;
+
+        if (
+        (runningTimeEntry && !this.runningTimeEntry) ||
+        isSameRunningTimeEntry
+      ) {
+        this.runningTimeEntry = {
+          id: runningTimeEntry.id,
+          start: new Date(runningTimeEntry.start)
+        };
+        this.startNotifyProgress();
+      }
+
+      if (!runningTimeEntry && this.runningTimeEntry) {
+        this.runningTimeEntry = null;
+        this.stopNotifyProgress();
+      }
+    } catch {}
   }
 }

@@ -38,7 +38,7 @@ export const activate = async ({
   // Create Toggl time entry manager
   const togglTimeEntry = new TogglTimeEntry(togglApiClient, {
     onStart: () => {
-      statusBarItem.display("starting...");
+      statusBarItem.display("...");
     },
     onProgress: msDuration => {
       let hours = Math.floor((msDuration / 1000 / 60 / 60) % 60);
@@ -73,6 +73,9 @@ export const activate = async ({
       if (!apiToken) {
         vscode.window.showErrorMessage("Toggl API token is required");
       }
+    }),
+    vscode.commands.registerCommand("toggl.sync", async () => {
+      await togglTimeEntry.sync();
     }),
     vscode.commands.registerCommand("toggl.openToggl", async () => {
       vscode.commands.executeCommand(

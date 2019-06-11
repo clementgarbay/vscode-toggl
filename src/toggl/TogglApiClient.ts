@@ -57,4 +57,8 @@ export class TogglApiClient {
   async stopTimeEntry(timeEntryId: string) {
     return this.togglApi.put(`/time_entries/${timeEntryId}/stop`);
   }
+
+  async getRunningTimeEntry() {
+    return this.togglApi.get('/time_entries/current');
+  }
 }

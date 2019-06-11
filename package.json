@@ -2,7 +2,7 @@
 	"name": "vscode-toggl",
 	"displayName": "Toggl for VSCode",
 	"description": "Toggl time tracker integration for VSCode",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"author": {
 		"name": "Clément Garbay",
 		"email": "contact@clementgarbay.fr"
@@ -25,6 +25,7 @@
 	},
 	"activationEvents": [
 		"onCommand:toggl.track",
+		"onCommand:toggl.sync",
 		"onCommand:toggl.setToken"
 	],
 	"main": "./out/extension.js",
@@ -35,8 +36,17 @@
 				"title": "Start / Stop",
 				"category": "Toggl",
 				"icon": {
-					"dark": "resources/logo-white.png",
-					"light": "resources/logo-gray.png"
+					"dark": "resources/power-white.png",
+					"light": "resources/power-gray.png"
+				}
+			},
+			{
+				"command": "toggl.sync",
+				"title": "Sync",
+				"category": "Toggl",
+				"icon": {
+					"dark": "resources/refresh-white.png",
+					"light": "resources/refresh-gray.png"
 				}
 			},
 			{
@@ -50,11 +60,18 @@
 				{
 					"command": "toggl.track",
 					"group": "navigation@-1"
+				},
+				{
+					"command": "toggl.sync",
+					"group": "navigation@-1"
 				}
 			],
 			"commandPalette": [
 				{
 					"command": "toggl.track"
+				},
+				{
+					"command": "toggl.sync"
 				},
 				{
 					"command": "toggl.setToken"
@@ -72,6 +89,7 @@
 				"properties": {
 					"toggl.extraTags": {
 						"type": "array",
+						"title": "List of additional tags to attach to the new tasks",
 						"default": []
 					}
 				}
